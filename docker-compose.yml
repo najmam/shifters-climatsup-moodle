@@ -1,0 +1,33 @@
+version: '2'
+services:
+  mariadb:
+    build:
+      context: .
+      dockerfile: mariadb.Dockerfile
+    image: shifters/mariadb-10.1-utf8mb4:1
+    environment:
+      - MARIADB_USER=bn_moodle
+      - MARIADB_DATABASE=bitnami_moodle
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - 'mariadb_data:/bitnami'
+  http:
+    build:
+      context: .
+      dockerfile: http.Dockerfile
+    image: shifters/http:1
+    ports:
+      - '80:80'
+    volumes:
+      - 'moodle_www:/var/www/html'
+      - 'moodle_data:/var/www/moodledata'
+      - './moodle-config.php:/var/www/html/config.php'
+    depends_on:
+      - mariadb
+volumes:
+  mariadb_data:
+    driver: local
+  moodle_data:
+    driver: local
+  moodle_www:
+    driver: local
